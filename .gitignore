@@ -37,3 +37,9 @@ build/
 
 # Macintosh
 .DS_Store%
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# VSCode
+.vscode
