@@ -3,24 +3,56 @@
 
 Perceptron::Perceptron() {}
 
-float Perceptron::sigmoid(float data) {
+double Perceptron::Sigmoid(double data) {
     return (1/(1 + exp(-data)));
 }
 
-float Perceptron::relu(float data) {
+double Perceptron::Relu(double data) {
     if (data < 0) {
         return 0;
     }
     return data;
 }
 
-float Perceptron::pred(std::vector<float> data) {
-    float ret;
+double Perceptron::Pred(std::vector<double> data) {
+    double ret;
     int counter = 0;
-    for (float i : data) {
+    for (double i : data) {
         ret = ret + (i*weights[counter]);
         counter = counter + 1;
     }
     ret = ret + bias;
-    return relu(ret);
+    return Relu(ret);
+}
+
+double Perceptron::DSigmoid(double data) {
+    double sigmoid = Sigmoid(data);
+    return sigmoid * (1 - sigmoid);
+}
+
+int Perceptron::DRelu(double data) {
+    if (data <= 0) {
+        return 0;
+    }
+    return 1;
+}
+
+double Perceptron::BCELoss(std::vector<double> actual, std::vector<double> predict) {
+    double loss = 0.0;
+    for (size_t i  = 0; i < actual.size(); i++) {
+        double diff = -1 * (actual[i] * log10(predict[i]) + (1 - actual[i]) * log10(1 - predict[i]));
+        loss += diff;
+    }
+    loss /= actual.size();
+    return loss;
+}
+
+double Perceptron::DBCELoss(std::vector<double> inputs, std::vector<double> actual, std::vector<double> predict) {
+    double loss = 0.0;
+    for (size_t i = 0; i < inputs.size(); i++) {
+        double diff = inputs[i] * (predict[i] - actual[i]);
+        loss += diff;
+    }
+    loss /= inputs.size();
+    return loss;
 }
