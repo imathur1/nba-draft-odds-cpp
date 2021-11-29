@@ -1,8 +1,6 @@
 #include "dataframe.hpp"
 
-DataFrame::DataFrame() {
-
-}
+DataFrame::DataFrame() {}
 
 DataFrame::DataFrame(std::string filename) {
     ReadCSV(filename);

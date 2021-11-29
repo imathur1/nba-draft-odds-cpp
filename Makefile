@@ -5,10 +5,10 @@ CXXFLAGS=-std=c++2a -g -fstandalone-debug -Wall -Wextra -Werror -pedantic $(INCL
 exec: bin/exec
 tests: bin/tests
 
-bin/exec: ./src/driver.cc ./src/dataframe.cc
+bin/exec: ./src/driver.cc ./src/dataframe.cc ./src/mlp.cc ./src/perceptron.cc
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
-bin/tests: ./tests/tests.cc obj/catch.o ./src/dataframe.cc
+bin/tests: ./tests/tests.cc obj/catch.o ./src/dataframe.cc ./src/mlp.cc ./src/perceptron.cc
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 obj/catch.o: tests/catch.cc

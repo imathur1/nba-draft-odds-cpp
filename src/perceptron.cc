@@ -37,22 +37,20 @@ int Perceptron::DRelu(double data) {
     return 1;
 }
 
-double Perceptron::BCELoss(std::vector<double> actual, std::vector<double> predict) {
-    double loss = 0.0;
+std::vector<double> Perceptron::BCELoss(std::vector<double> actual, std::vector<double> predict) {
+    std::vector<double> losses;
     for (size_t i  = 0; i < actual.size(); i++) {
-        double diff = -1 * (actual[i] * log10(predict[i]) + (1 - actual[i]) * log10(1 - predict[i]));
-        loss += diff;
+        double loss = -1 * (actual[i] * log10(predict[i]) + (1 - actual[i]) * log10(1 - predict[i]));
+        losses.push_back(loss);
     }
-    loss /= actual.size();
-    return loss;
+    return losses;
 }
 
-double Perceptron::DBCELoss(std::vector<double> inputs, std::vector<double> actual, std::vector<double> predict) {
-    double loss = 0.0;
-    for (size_t i = 0; i < inputs.size(); i++) {
-        double diff = inputs[i] * (predict[i] - actual[i]);
-        loss += diff;
+std::vector<double> Perceptron::DBCELoss(std::vector<double> actual, std::vector<double> predict) {
+    std::vector<double> losses;
+    for (size_t i = 0; i < actual.size(); i++) {
+        double loss = -1 * actual[i] / predict[i] + (1 - actual[i]) / (1 - predict[i]);
+        losses.push_back(loss);
     }
-    loss /= inputs.size();
-    return loss;
+    return losses;
 }
