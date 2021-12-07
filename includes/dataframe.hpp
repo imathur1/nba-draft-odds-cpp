@@ -21,8 +21,13 @@ class DataFrame {
         DataFrame GetColumn(std::string column);
         void ConvertToNumber();
         void Normalize();
+
+        std::vector<std::string> GetColNames() { return col_names_; }
+        std::vector<std::vector<std::string>>GetData() { return data_; }
+        std::vector<std::vector<double>> GetInputs() { return inputs_; }
+
     // private:
-        int indexOf(std::vector<std::string> v, std::string s);
+        int ColIndexOf(std::vector<std::string> col_names, std::string col);
 
         std::vector<std::string> col_names_;
         std::vector<std::vector<std::string>> data_;

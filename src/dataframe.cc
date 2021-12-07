@@ -1,4 +1,5 @@
 #include "dataframe.hpp"
+#include <stdexcept>
 
 DataFrame::DataFrame() {}
 
@@ -7,6 +8,7 @@ DataFrame::DataFrame(std::string filename) {
 }
 
 DataFrame::DataFrame(std::vector<std::vector<std::string>> v) {
+    // Initializing DataFrame from the 2D vector of another DataFrame
     if (v.empty()) {
         throw std::runtime_error("Invalid data format");
     }
@@ -21,12 +23,16 @@ void DataFrame::ReadCSV(std::string filename) {
     std::string line;
     bool firstLine = true;
     size_t num_cols = -1;
+    if (!ifs.good()) {
+        throw std::runtime_error("Invalid file name");
+    }
     while(std::getline(ifs, line, '\n')) {
         std::stringstream line_stream(line);
         std::string column;
         std::vector<std::string> data;
         int col_count = 1;
         while(std::getline(line_stream, column, ',')) {
+            // First row of CSV contains column names. Rest of CSV contains actual data
             if (firstLine) {
                 // Can't have columns with no name
                 if (column == "" || column == "\r") {
@@ -54,7 +60,7 @@ void DataFrame::ReadCSV(std::string filename) {
 }
 
 void DataFrame::ConvertEmptyToInt(std::string column) {
-    int index = indexOf(col_names_, column);
+    int index = ColIndexOf(col_names_, column);
     if (index == -1) {
         throw std::runtime_error("Invalid column");
     }
@@ -70,7 +76,7 @@ void DataFrame::ConvertEmptyToInt(std::string column) {
 }
 
 void DataFrame::FillEmpty(std::string column, std::string value) {
-    int index = indexOf(col_names_, column);
+    int index = ColIndexOf(col_names_, column);
     if (index == -1) {
         throw std::runtime_error("Invalid column");
     }
@@ -86,7 +92,7 @@ void DataFrame::FillEmpty(std::string column, std::string value) {
 void DataFrame::DropColumns(std::vector<std::string> cols) {
     std::vector<int> indices;
     for (size_t i = 0; i < cols.size(); i++) {
-        int index = indexOf(col_names_, cols.at(i));
+        int index = ColIndexOf(col_names_, cols.at(i));
         if (index == -1) {
             throw std::runtime_error("Invalid column");
         }
@@ -123,7 +129,7 @@ void DataFrame::DropRowsWithEmptyData() {
 }
 
 DataFrame DataFrame::GetColumn(std::string column) {
-    int index = indexOf(col_names_, column);
+    int index = ColIndexOf(col_names_, column);
     if (index == -1) {
         throw std::runtime_error("Invalid column");
     }
@@ -177,9 +183,9 @@ void DataFrame::Normalize() {
     }
 }
 
-int DataFrame::indexOf(std::vector<std::string> v, std::string s) {
-    for (size_t i = 0; i < v.size(); i++) {
-        if (s == v.at(i)) {
+int DataFrame::ColIndexOf(std::vector<std::string> col_names, std::string col) {
+    for (size_t i = 0; i < col_names.size(); i++) {
+        if (col == col_names.at(i)) {
             return i;
         }
     }

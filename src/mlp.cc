@@ -4,21 +4,27 @@ MLP::MLP() {}
 
 MLP::MLP(std::vector<double> input_data) {
     layer_sizes_[0] = input_data.size();
-    data_.push_back(input_data);
+    nodes_.push_back(input_data);
     InitializeMatrices();
 }
 
 void MLP::InitializeMatrices() {
+    // The nodes in the first layer are the input into the model
+    // Initialize the nodes in the rest of the layers to 0
     for (size_t i = 1; i < layer_sizes_.size(); i++) {
         std::vector<double> d(layer_sizes_[i], 0);
-        data_.push_back(d);
+        nodes_.push_back(d);
     }
 
+    // Initialize the activations of the nodes in all layers besides the 
+    // input layer to 0
     for (size_t i = 1; i < layer_sizes_.size(); i++) {
         std::vector<double> a(layer_sizes_[i], 0);
         activations_.push_back(a);
     }
 
+    // Initialize all weighted connections between all layers to a random
+    // number between 0 and 1
     for (size_t i = 0; i < layer_sizes_.size() - 1; i++) {
         std::vector<std::vector<double>> layer_weights;
         for (int j = 0; j < layer_sizes_[i + 1]; j++) {
@@ -31,6 +37,8 @@ void MLP::InitializeMatrices() {
         weights_.push_back(layer_weights);
     }
 
+    // Initialize the biases of all nodes in all layers except the input layer to a random
+    // number between 0 and 1
     for (size_t i = 1; i < layer_sizes_.size(); i++) {
         std::vector<double> b;
         for (int j = 0; j < layer_sizes_[i]; j++) {
@@ -45,26 +53,39 @@ void MLP::Train() {
 }
 
 bool Predict(std::vector<double> data) {
-
+    if (data.size() == 0) {
+        
+    }
+    return false;
 }
 
 void MLP::ForwardPropagation() {
     for (size_t i = 0; i < layer_sizes_.size() - 1; i++) {
         std::vector<double> z;
         if (i == 0) {
+            // If it's the input layer, compute z = x * w + b
+            // where z is the output in the next layer, x is the input,
+            // w is the weight, and b is the bias.
+            // Compute this for all connections between the input and hidden layer
             for (int j = 0; j < layer_sizes_[i + 1]; j++) {
-                double prod = std::inner_product(std::begin(data_[i]), std::end(data_[i]),
+                double prod = std::inner_product(std::begin(nodes_[i]), std::end(nodes_[i]),
                                 std::begin(weights_[i][j]), 0.0) + biases_[i][j];
                 z.push_back(prod);
             }
         } else {
+            // If it's not the input layer, compute z = a * w + b
+            // where z is the output in the next layer, a is the activation of the previous layer,
+            // w is the weight, and b is the bias.
+            // Compute this for all connections between the input and hidden layer
             for (int j = 0; j < layer_sizes_[i + 1]; j++) {
                 double prod = std::inner_product(std::begin(activations_[i - 1]), std::end(activations_[i - 1]),
                                 std::begin(weights_[i][j]), 0.0) + biases_[i][j];
                 z.push_back(prod);
             }
         }
-        data_[i + 1] = z;
+        nodes_[i + 1] = z;
+        // Use ReLU for the activation function unless it is the output layer
+        // In that case use sigmoid
         if (i == layer_sizes_.size() - 2) {
             for (int j = 0; j < layer_sizes_[i + 1]; j++) {
                 double y = Sigmoid(z[j]);

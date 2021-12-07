@@ -26,8 +26,8 @@ class MLP {
         std::vector<double> BCE(std::vector<double> actual, std::vector<double> predict);
         std::vector<double> BCEPrime(std::vector<double> actual, std::vector<double> predict);
         
-        std::vector<int> layer_sizes_ = {0, 2, 1, 1};
-        std::vector<std::vector<double>> data_;
+        std::vector<int> layer_sizes_ = {0, 4, 1};
+        std::vector<std::vector<double>> nodes_;
         std::vector<std::vector<double>> activations_;
         std::vector<std::vector<std::vector<double>>> weights_;
         std::vector<std::vector<double>> biases_;
