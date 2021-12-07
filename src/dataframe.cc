@@ -90,6 +90,7 @@ void DataFrame::FillEmpty(std::string column, std::string value) {
 }
 
 void DataFrame::DropColumns(std::vector<std::string> cols) {
+    // Drops all columns in the vector passed from the database
     std::vector<int> indices;
     for (size_t i = 0; i < cols.size(); i++) {
         int index = ColIndexOf(col_names_, cols.at(i));
@@ -129,6 +130,7 @@ void DataFrame::DropRowsWithEmptyData() {
 }
 
 DataFrame DataFrame::GetColumn(std::string column) {
+    // Returns relevant column as dataframe
     int index = ColIndexOf(col_names_, column);
     if (index == -1) {
         throw std::runtime_error("Invalid column");
@@ -184,6 +186,8 @@ void DataFrame::Normalize() {
 }
 
 int DataFrame::ColIndexOf(std::vector<std::string> col_names, std::string col) {
+    // Returns index of passed column name
+    // -1 if not present
     for (size_t i = 0; i < col_names.size(); i++) {
         if (col == col_names.at(i)) {
             return i;
