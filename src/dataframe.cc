@@ -151,7 +151,11 @@ void DataFrame::ConvertToNumber() {
     for (size_t i = 0; i < data_.size(); i++) {
         std::vector<double> v;
         for (size_t j = 0; j < data_.at(i).size(); j++) {
-            v.push_back(std::stod(data_.at(i).at(j)));
+            try {
+                v.push_back(std::stod(data_.at(i).at(j)));
+            } catch (std::invalid_argument e) {
+                continue;
+            }
         }
         inputs_.push_back(v);
     }
