@@ -245,10 +245,12 @@ void MLP::ForwardPropagation() {
 }
 
 double MLP::Sigmoid(double z) {
+    // Calculates sigmoid value for a given input
     return (1/(1 + exp(-z)));
 }
 
 double MLP::ReLU(double z) {
+    // Calculates ReLU value for a given input
     if (z < 0) {
         return 0;
     }
@@ -256,10 +258,12 @@ double MLP::ReLU(double z) {
 }
 
 double MLP::SigmoidPrime(double z) {
+    // Calculates the derivative of sigmoid for a given input
     return z * (1 - z);
 }
 
 double MLP::ReLUPrime(double z) {
+    // Calculates the derivative of ReLU for a given input
     if (z <= 0) {
         return 0;
     }
@@ -267,6 +271,7 @@ double MLP::ReLUPrime(double z) {
 }
 
 std::vector<double> MLP::BCE(std::vector<double> actual, std::vector<double> predict) {
+    // Calculates Binary Cross Entropy measures between actual and predicted values
     std::vector<double> losses;
     for (size_t i  = 0; i < actual.size(); i++) {
         double loss = -1 * (actual[i] * log10(predict[i]) + (1 - actual[i]) * log10(1 - predict[i]));
@@ -276,6 +281,7 @@ std::vector<double> MLP::BCE(std::vector<double> actual, std::vector<double> pre
 }
 
 std::vector<double> MLP::BCEPrime(std::vector<double> actual, std::vector<double> predict) {
+    // Calculates Binary Cross Entropy derivitave measures between actual and predicted values
     std::vector<double> losses;
     for (size_t i = 0; i < actual.size(); i++) {
         double loss = -1 * actual[i] / predict[i] + (1 - actual[i]) / (1 - predict[i]);
