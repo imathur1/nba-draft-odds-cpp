@@ -78,5 +78,6 @@
         "__node_handle": "cpp",
         "bit": "cpp",
         "complex": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }

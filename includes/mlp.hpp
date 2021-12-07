@@ -4,7 +4,9 @@
 #include <vector>
 #include <numeric>
 #include <iostream>
-#include <math.h>
+#include <cmath>
+#include <algorithm>
+#include <tuple>
 
 class MLP {
     public:
@@ -16,7 +18,7 @@ class MLP {
     private:
         void InitializeMatrices();
         void ForwardPropagation();
-        void BackwardPropagation();
+        std::tuple<std::vector<std::vector<std::vector<double>>>, std::vector<std::vector<double>>> BackwardPropagation(std::vector<double> actual);
         void UpdateWeightsBiases();
 
         double Sigmoid(double z);
@@ -25,12 +27,16 @@ class MLP {
         double ReLUPrime(double z);
         std::vector<double> BCE(std::vector<double> actual, std::vector<double> predict);
         std::vector<double> BCEPrime(std::vector<double> actual, std::vector<double> predict);
+
+        std::vector<std::vector<double>> Transpose(std::vector<std::vector<double>> m);
+        std::vector<std::vector<double>> mulMat(std::vector<std::vector<double>> m1, std::vector<std::vector<double>>m2);
         
-        std::vector<int> layer_sizes_ = {0, 2, 1, 1};
+        std::vector<int> layer_sizes_ = {0, 4, 1};
         std::vector<std::vector<double>> data_;
         std::vector<std::vector<double>> activations_;
         std::vector<std::vector<std::vector<double>>> weights_;
         std::vector<std::vector<double>> biases_;
+        double lr = 0.01;
 };
 
 #endif
