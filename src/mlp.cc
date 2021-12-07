@@ -60,19 +60,27 @@ bool Predict(std::vector<double> data) {
 }
 
 std::tuple<std::vector<std::vector<std::vector<double>>>, std::vector<std::vector<double>>> MLP::BackwardPropagation(std::vector<double> actual) {
+    //Store the gradient of all weights and biases in nested vectors
     std::vector<std::vector<std::vector<double>>> weightsgrad;
     std::vector<std::vector<double>> biasesgrad;
 
+    //Calculates the partial derivatives of weights and biases
     for (size_t i = weights_.size() -  1; i >= 0; i--) {
         size_t num_partials = 3 + 2 * (weights_.size() - i - 1);
         std::vector<std::vector<std::vector<double>>> wparts;
         std::vector<std::vector<std::vector<double>>> bparts;
+
+        //Finds partial derivatives for each layer
         for (size_t j = 0; j < num_partials; j++) {
             std::vector<std::vector<double>> wpart;
             std::vector<std::vector<double>> bpart;
+
+            // BCE Loss
             if (j == 0) {
                 wpart.push_back(BCEPrime(actual, activations_[activations_.size() - 1]));
                 bpart = wpart;
+            
+            // Previous layer activation function output / initial inputs
             } else if (j == num_partials - 1) {
                 int index = activations_.size() - ceil(j / 2) - 1;
                 std::vector<double> a;
@@ -83,13 +91,17 @@ std::tuple<std::vector<std::vector<std::vector<double>>>, std::vector<std::vecto
                 }
                 wpart.push_back(a);
                 bpart.push_back({1});
+            
+            // Activation functions
             } else if (j % 2 != 0) {
                 std::vector<double> a = activations_[activations_.size() - ceil(j/2)];
+                //If it's the last layer, store the derivative of the sigmoid activation function
                 if (j == 1) {
                     for (size_t i = 0; i < a.size(); i++) {
                         std::vector<double> data = {SigmoidPrime(a[i])};
                         wpart.push_back(data);
                     }
+                //If it's not the last layer, store the derivative of the ReLU activation function
                 } else {
                     for (size_t i = 0; i < a.size(); i++) {
                         std::vector<double> data = {ReLUPrime(a[i])};
@@ -98,15 +110,17 @@ std::tuple<std::vector<std::vector<std::vector<double>>>, std::vector<std::vecto
                 }
                 bpart = wpart;
 
+            // Otherwise transpose specific weights for matrix math
             } else {
-                std::vector<double> z = nodes_[nodes_.size() - ceil(j/2)];
                 std::vector<std::vector<double>> w = weights_[weights_.size() - ceil(j/2)];
-                std::vector<std::vector<double>> wpart = Transpose(w);
-                std::vector<std::vector<double>> bpart = wpart;
+                wpart = Transpose(w);
+                bpart = wpart;
             }
             wparts.push_back(wpart);
             bparts.push_back(bpart);
         }
+
+        //Do matrix multiplication and element-wise multiplication for both gradients
         std::vector<std::vector<double>> wgrad;
         std::vector<std::vector<double>> bgrad;
         for (size_t j = 0; j < wparts.size(); j+=2) {
@@ -133,6 +147,7 @@ std::tuple<std::vector<std::vector<std::vector<double>>>, std::vector<std::vecto
             }
         }
         
+        //Finds the average gradient from all of the samples
         std::vector<std::vector<double>> twparts = Transpose(wparts[wparts.size()-1]);
         wgrad = MatMul(twparts, wgrad);
         for (size_t i = 0; i < wgrad.size(); i++) {
@@ -149,14 +164,15 @@ std::tuple<std::vector<std::vector<std::vector<double>>>, std::vector<std::vecto
             total /= bgrad.size();
             bgradient.push_back(total);
         }
-
         weightsgrad.push_back(wgrad);
         biasesgrad.push_back(bgradient);
-
-        
     }
+
+    //Reverse the gradients to match the forward direction of the mlp
     std::reverse(weightsgrad.begin(), weightsgrad.end());
     std::reverse(biasesgrad.begin(), biasesgrad.end());
+
+    //Return a tuple of the gradients
     std::tuple<std::vector<std::vector<std::vector<double>>>, std::vector<std::vector<double>>> items = {weightsgrad, biasesgrad};
     return items;
 }
