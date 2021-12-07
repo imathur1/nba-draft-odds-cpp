@@ -68,7 +68,7 @@ TEST_CASE("DataFrame DropColumns", "[DF_DropColumns]") {
         DataFrame df = DataFrame(filename);
         std::vector<std::string> cols_to_drop = {"yr", "ht", "num", "ast/tov", "rimmade", "rimmade+rimmiss", "midmade", "midmade+midmiss", 
                 "rimmade/(rimmade+rimmiss)", "midmade/(midmade+midmiss)", "dunksmade", "dunksmiss+dunksmade",
-                "dunksmade/(dunksmade+dunksmiss)", "pick", "team", "conf", "type", "year", "pid", "player_name", "Unnamed: 65", "Unnamed: 66"};    REQUIRE_THROWS_AS(df.DropColumns(v), std::runtime_error);
+                "dunksmade/(dunksmade+dunksmiss)", "pick", "team", "conf", "type", "year", "pid", "player_name", "Unnamed: 65", "Unnamed: 66"};    
         df.DropColumns(cols_to_drop);
         REQUIRE(df.GetColNames().size() == 44);
         REQUIRE(df.GetData().size() == 61061);
