@@ -102,11 +102,14 @@ TEST_CASE("DataFrame GetColumn", "[DF_GetColumn]") {
         REQUIRE(pick_df.GetColNames().size() == 1);
         REQUIRE(pick_df.GetData().size() == 61061);
         REQUIRE(pick_df.GetData().at(0).size() == 1);
+        REQUIRE(df.GetColNames().size() == 66);
+        REQUIRE(df.GetData().size() == 61061);
+        REQUIRE(df.GetData().at(0).size() == 66);
     }
     SECTION("Get invalid column") {
         std::string filename = "data.csv";
         DataFrame df = DataFrame(filename);
-        REQUIRE_THROWS_AS(df.GetColumn("pick"), std::runtime_error);
+        REQUIRE_THROWS_AS(df.GetColumn("irrelevant"), std::runtime_error);
     }
 }
 
