@@ -13,9 +13,9 @@ TEST_CASE("DataFrame ReadCSV", "[DF_ReadCSV]") {
     SECTION("Reading csv with valid name") {
         std::string filename = "data.csv";
         DataFrame df = DataFrame(filename);
-        REQUIRE(df.GetColNames().size() == 66);
+        REQUIRE(df.GetColNames().size() == 65);
         REQUIRE(df.GetData().size() == 61061);
-        REQUIRE(df.GetData().at(0).size() == 66);
+        REQUIRE(df.GetData().at(0).size() == 65);
     }
     SECTION("Reading invalid csv name") {
         std::string filename = "dataf.csv";
@@ -68,7 +68,7 @@ TEST_CASE("DataFrame DropColumns", "[DF_DropColumns]") {
         DataFrame df = DataFrame(filename);
         std::vector<std::string> cols_to_drop = {"yr", "ht", "num", "ast/tov", "rimmade", "rimmade+rimmiss", "midmade", "midmade+midmiss", 
                 "rimmade/(rimmade+rimmiss)", "midmade/(midmade+midmiss)", "dunksmade", "dunksmiss+dunksmade",
-                "dunksmade/(dunksmade+dunksmiss)", "pick", "team", "conf", "type", "year", "pid", "player_name", "Unnamed: 65", "Unnamed: 66"};    
+                "dunksmade/(dunksmade+dunksmiss)", "pick", "team", "conf", "type", "year", "pid", "player_name", "Unnamed: 65"};    
         df.DropColumns(cols_to_drop);
         REQUIRE(df.GetColNames().size() == 44);
         REQUIRE(df.GetData().size() == 61061);
@@ -87,11 +87,14 @@ TEST_CASE("DataFrame DropRowsWithEmptyData", "[DF_DropRowsWithEmptyData]") {
     DataFrame df = DataFrame(filename);
     std::vector<std::string> cols_to_drop = {"yr", "ht", "num", "ast/tov", "rimmade", "rimmade+rimmiss", "midmade", "midmade+midmiss", 
              "rimmade/(rimmade+rimmiss)", "midmade/(midmade+midmiss)", "dunksmade", "dunksmiss+dunksmade",
-             "dunksmade/(dunksmade+dunksmiss)", "pick", "team", "conf", "type", "year", "pid", "player_name", "Unnamed: 65", "Unnamed: 66"};
+             "dunksmade/(dunksmade+dunksmiss)", "pick", "team", "conf", "type", "year", "pid", "player_name", "Unnamed: 65"};
     df.DropColumns(cols_to_drop);
     df.FillEmpty("Rec Rank", "0");
     df.DropRowsWithEmptyData();
-    REQUIRE(df.GetData().size() == 61015);
+    REQUIRE(df.GetColNames().size() == 44);
+    REQUIRE(df.GetData().size() == 56367);
+    REQUIRE(df.GetData().at(0).size() == 44);
+
 }
 
 TEST_CASE("DataFrame GetColumn", "[DF_GetColumn]") {
@@ -102,9 +105,9 @@ TEST_CASE("DataFrame GetColumn", "[DF_GetColumn]") {
         REQUIRE(pick_df.GetColNames().size() == 1);
         REQUIRE(pick_df.GetData().size() == 61061);
         REQUIRE(pick_df.GetData().at(0).size() == 1);
-        REQUIRE(df.GetColNames().size() == 66);
+        REQUIRE(df.GetColNames().size() == 65);
         REQUIRE(df.GetData().size() == 61061);
-        REQUIRE(df.GetData().at(0).size() == 66);
+        REQUIRE(df.GetData().at(0).size() == 65);
     }
     SECTION("Get invalid column") {
         std::string filename = "data.csv";
@@ -120,7 +123,7 @@ TEST_CASE("DataFrame ConvertToNumber", "[DF_ConvertToNumber]") {
     DataFrame output = df.GetColumn("pick");
     std::vector<std::string> cols_to_drop = {"yr", "ht", "num", "ast/tov", "rimmade", "rimmade+rimmiss", "midmade", "midmade+midmiss", 
                 "rimmade/(rimmade+rimmiss)", "midmade/(midmade+midmiss)", "dunksmade", "dunksmiss+dunksmade",
-                "dunksmade/(dunksmade+dunksmiss)", "pick", "team", "conf", "type", "year", "pid", "player_name", "Unnamed: 65", "Unnamed: 66"};
+                "dunksmade/(dunksmade+dunksmiss)", "pick", "team", "conf", "type", "year", "pid", "player_name", "Unnamed: 65"};
     df.DropColumns(cols_to_drop);
     df.FillEmpty("Rec Rank", "0");
     df.DropRowsWithEmptyData();
