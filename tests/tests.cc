@@ -125,3 +125,38 @@ TEST_CASE("DataFrame ConvertToNumber", "[DF_ConvertToNumber]") {
     REQUIRE(df.GetInputs().size() == 61061);
     REQUIRE(df.GetInputs().at(0).size() == 44);
 }
+
+TEST_CASE("MLP test decreasing loss and increasing accuracy", "[MLP]") {
+    srand ( time(NULL) );
+
+    std::string filename = "data.csv";
+    DataFrame df = DataFrame(filename);
+    df.ConvertEmptyToInt("pick");
+    df.DropRowsWithColValue("pick", "0", 0.98);
+    
+    DataFrame y_df = df.GetColumn("pick");
+    y_df.ConvertToNumber();
+    std::vector<std::string> cols_to_drop = {"yr", "ht", "num", "ast/tov", "rimmade", "rimmade+rimmiss", "midmade", "midmade+midmiss", 
+             "rimmade/(rimmade+rimmiss)", "midmade/(midmade+midmiss)", "dunksmade", "dunksmiss+dunksmade",
+             "dunksmade/(dunksmade+dunksmiss)", "pick", "team", "conf", "type", "year", "pid", "player_name", "Unnamed: 65", "Unnamed: 66"};
+    df.DropColumns(cols_to_drop);
+    df.FillEmpty("Rec Rank", "0");
+    df.DropRowsWithEmptyData();
+    df.ConvertToNumber();
+    df.Normalize();
+
+    std::vector<std::vector<std::vector<double>>> data = df.GetTrainValidSplit(0.2, y_df);
+    MLP mlp = MLP(data[0], data[1], data[2], data[3]);
+    double lr = 0.01;
+    int num_epochs = 100;
+    std::vector<std::vector<double>> metrics = mlp.Train(lr, num_epochs);
+
+    // End train loss is less than beginning train loss
+    REQUIRE(metrics[0][metrics[0].size() - 1] < metrics[0][0]);
+    // End train accuracy is greater than beginning train accuracy
+    REQUIRE(metrics[1][metrics[1].size() - 1] > metrics[1][0]);
+    // End valid loss is less than beginning valid loss
+    REQUIRE(metrics[2][metrics[2].size() - 1] < metrics[2][0]);
+    // End valid accuracy is greater than beginning valid accuracy
+    REQUIRE(metrics[3][metrics[3].size() - 1] > metrics[3][0]);
+}

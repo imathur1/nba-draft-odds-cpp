@@ -1,5 +1,4 @@
 #include "dataframe.hpp"
-#include <stdexcept>
 
 DataFrame::DataFrame() {}
 
@@ -128,6 +127,48 @@ void DataFrame::DropRowsWithEmptyData() {
     }
 }
 
+void DataFrame::DropRowsWithColValue(std::string column, std::string value, double frac) {
+    // Go over every row. If the passed column has the passed value, drop it with the probability of frac
+    for (size_t row = data_.size() - 1; row >= 0 ; row--) {
+        for (size_t col = 0; col < data_.at(row).size(); col++) {
+            if (col_names_.at(col) == column) {
+                if (data_.at(row).at(col) == value) {
+                    double probability = ((double) std::rand() / (RAND_MAX));
+                    if (probability <= frac) {
+                        data_.erase(data_.begin() + row);
+                    }
+                }
+                break;
+            }
+        }
+        if (row == 0) {
+            break;
+        }
+    }
+}
+
+std::vector<std::vector<std::vector<double>>> DataFrame::GetTrainValidSplit(double frac, DataFrame y_df) {
+    std::vector<std::vector<double>> x_train;
+    std::vector<std::vector<double>> y_train;
+    std::vector<std::vector<double>> x_valid;
+    std::vector<std::vector<double>> y_valid;
+
+    // Go over every row. Move the row with the passed probability to the validation data
+    for (size_t row = 0; row < inputs_.size(); row++) {
+        double probability = ((double) std::rand() / (RAND_MAX));
+        if (probability <= frac) {
+            x_valid.push_back(inputs_[row]);
+            y_valid.push_back(y_df.inputs_[row]);
+        } else {
+            x_train.push_back(inputs_[row]);
+            y_train.push_back(y_df.inputs_[row]);
+        }
+    }
+
+    std::vector<std::vector<std::vector<double>>> data = {x_train, y_train, x_valid, y_valid};
+    return data;
+}
+
 DataFrame DataFrame::GetColumn(std::string column) {
     int index = ColIndexOf(col_names_, column);
     if (index == -1) {
@@ -146,12 +187,28 @@ DataFrame DataFrame::GetColumn(std::string column) {
 }
 
 void DataFrame::ConvertToNumber() {
+    col_means_.clear();
+    col_mins_.clear();
+    col_maxes_.clear();
     for (size_t i = 0; i < data_.size(); i++) {
+        double mean = 0;
+        double min = std::numeric_limits<double>::min();
+        double max = std::numeric_limits<double>::max();
         std::vector<double> v;
         for (size_t j = 0; j < data_.at(i).size(); j++) {
             v.push_back(std::stod(data_.at(i).at(j)));
+            mean += v[j];
+            if (v[j] < min) {
+                min = v[j];
+            }
+            if (v[j] > max) {
+                max = v[j];
+            }
         }
         inputs_.push_back(v);
+        col_means_.push_back(mean / data_.at(i).size());
+        col_mins_.push_back(min);
+        col_maxes_.push_back(max);
     }
 }
 
@@ -176,6 +233,14 @@ void DataFrame::Normalize() {
         mins.push_back(min);
     }
 
+    for (size_t col = 0; col < col_names_.size(); col++) {
+        for (size_t row = 0; row < inputs_.size(); row++) {
+            inputs_.at(row).at(col) = (inputs_.at(row).at(col) - mins.at(col)) / (maxes.at(col) - mins.at(col));
+        }
+    }
+}
+
+void DataFrame::Normalize(std::vector<double> maxes, std::vector<double> mins) {
     for (size_t col = 0; col < col_names_.size(); col++) {
         for (size_t row = 0; row < inputs_.size(); row++) {
             inputs_.at(row).at(col) = (inputs_.at(row).at(col) - mins.at(col)) / (maxes.at(col) - mins.at(col));

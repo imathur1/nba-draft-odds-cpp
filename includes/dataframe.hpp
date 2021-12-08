@@ -6,6 +6,8 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <random>
+#include <limits>
 
 class DataFrame {
     public:
@@ -18,20 +20,31 @@ class DataFrame {
         void FillEmpty(std::string column, std::string value);
         void DropColumns(std::vector<std::string> cols);
         void DropRowsWithEmptyData();
+        void DropRowsWithColValue(std::string column, std::string value, double frac);
+        std::vector<std::vector<std::vector<double>>> GetTrainValidSplit(double frac, DataFrame y_df);
         DataFrame GetColumn(std::string column);
         void ConvertToNumber();
         void Normalize();
+        void Normalize(std::vector<double> maxes, std::vector<double> mins);
 
         std::vector<std::string> GetColNames() { return col_names_; }
-        std::vector<std::vector<std::string>>GetData() { return data_; }
+        std::vector<std::vector<std::string>> GetData() { return data_; }
         std::vector<std::vector<double>> GetInputs() { return inputs_; }
 
-    // private:
+        std::vector<double> GetColMeans() { return col_means_; }
+        std::vector<double> GetColMaxes() { return col_maxes_; }
+        std::vector<double> GetColMins() { return col_mins_; }
+
+    private:
         int ColIndexOf(std::vector<std::string> col_names, std::string col);
 
         std::vector<std::string> col_names_;
         std::vector<std::vector<std::string>> data_;
         std::vector<std::vector<double>> inputs_;
+
+        std::vector<double> col_means_;
+        std::vector<double> col_maxes_;
+        std::vector<double> col_mins_;
 };
 
 #endif

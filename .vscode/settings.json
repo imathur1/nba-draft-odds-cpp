@@ -77,7 +77,8 @@
         "__errc": "cpp",
         "__node_handle": "cpp",
         "bit": "cpp",
-        "complex": "cpp"
+        "complex": "cpp",
+        "filesystem": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
