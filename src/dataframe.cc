@@ -89,6 +89,7 @@ void DataFrame::FillEmpty(std::string column, std::string value) {
 }
 
 void DataFrame::DropColumns(std::vector<std::string> cols) {
+    // Drops all columns in the vector passed from the database
     std::vector<int> indices;
     for (size_t i = 0; i < cols.size(); i++) {
         int index = ColIndexOf(col_names_, cols.at(i));
@@ -170,6 +171,7 @@ std::vector<std::vector<std::vector<double>>> DataFrame::GetTrainValidSplit(doub
 }
 
 DataFrame DataFrame::GetColumn(std::string column) {
+    // Returns relevant column as dataframe
     int index = ColIndexOf(col_names_, column);
     if (index == -1) {
         throw std::runtime_error("Invalid column");
@@ -196,13 +198,17 @@ void DataFrame::ConvertToNumber() {
         double max = std::numeric_limits<double>::max();
         std::vector<double> v;
         for (size_t j = 0; j < data_.at(i).size(); j++) {
-            v.push_back(std::stod(data_.at(i).at(j)));
-            mean += v[j];
-            if (v[j] < min) {
-                min = v[j];
-            }
-            if (v[j] > max) {
-                max = v[j];
+            try {
+                v.push_back(std::stod(data_.at(i).at(j)));
+                mean += v[j];
+                if (v[j] < min) {
+                    min = v[j];
+                }
+                if (v[j] > max) {
+                    max = v[j];
+                }
+            } catch (std::invalid_argument e) {
+                throw std::runtime_error("Invalid argument");
             }
         }
         inputs_.push_back(v);
@@ -249,6 +255,8 @@ void DataFrame::Normalize(std::vector<double> maxes, std::vector<double> mins) {
 }
 
 int DataFrame::ColIndexOf(std::vector<std::string> col_names, std::string col) {
+    // Returns index of passed column name
+    // -1 if not present
     for (size_t i = 0; i < col_names.size(); i++) {
         if (col == col_names.at(i)) {
             return i;

@@ -32,9 +32,13 @@ int main() {
 
     MLP mlp = MLP(data[0], data[1], data[2], data[3]);
     double lr = 0.01;
-    int num_epochs = 400;
+    int num_epochs = 100;
     std::vector<std::vector<double>> metrics = mlp.Train(lr, num_epochs);
-    
+    std::cout << "Final Train Loss: " << metrics[0][metrics[0].size() - 1] << "\n";
+    std::cout << "Final Train Accuracy: " << metrics[1][metrics[1].size() - 1] << "\n";
+    std::cout << "Final Validation Loss: " << metrics[2][metrics[2].size() - 1] << "\n";
+    std::cout << "Final Validation Accuracy: " << metrics[3][metrics[3].size() - 1] << "\n";
+
     // Predicting
     std::string test_filename = "prediction.csv";
     DataFrame test_df = DataFrame(test_filename);
