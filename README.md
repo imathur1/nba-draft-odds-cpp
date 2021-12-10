@@ -1,4 +1,6 @@
-# final-project-thecodingcowboys
+# custom-nba-mlp-cpp
+
+An implementation of https://github.com/imathur1/custom-nba-mlp in C++.
 
 To build our project run `make exec`. Then run the `driver.cc` file by typing `./bin/exec`, which will read the college basketball player data from the CSV file into a DataFrame object.
 Subsequently, an MLP model will be trained using DataFrame's data. After the model is trained you can predict the probability of a current college basketball player being drafted into the NBA using the `MLP.Predict()` function.
