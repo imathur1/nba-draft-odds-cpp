@@ -16,15 +16,18 @@ int main() {
     // Undersampling: Too many players don't get drafted which makes for imbalanced classes
     // So drop some of the players who don't get drafted
     df.DropRowsWithColValue("pick", "0", 0.975);
-    
-    DataFrame y_df = df.GetColumn("pick");
-    y_df.ConvertToNumber();
+ 
     std::vector<std::string> cols_to_drop = {"yr", "ht", "num", "ast/tov", "rimmade", "rimmade+rimmiss", "midmade", "midmade+midmiss", 
              "rimmade/(rimmade+rimmiss)", "midmade/(midmade+midmiss)", "dunksmade", "dunksmiss+dunksmade",
-             "dunksmade/(dunksmade+dunksmiss)", "pick", "team", "conf", "type", "year", "pid", "player_name", "Unnamed: 65", "Unnamed: 66"};
+             "dunksmade/(dunksmade+dunksmiss)", "team", "conf", "type", "year", "pid", "player_name", "Unnamed: 65", "Unnamed: 66"};
     df.DropColumns(cols_to_drop);
     df.FillEmpty("Rec Rank", "0");
     df.DropRowsWithEmptyData();
+
+    DataFrame y_df = df.GetColumn("pick");
+    y_df.ConvertToNumber();
+    df.DropColumns({"pick"});
+
     df.ConvertToNumber();
     df.Normalize();
 
@@ -32,19 +35,21 @@ int main() {
 
     MLP mlp = MLP(data[0], data[1], data[2], data[3]);
     double lr = 0.01;
-    int num_epochs = 100;
+    int num_epochs = 500;
     std::vector<std::vector<double>> metrics = mlp.Train(lr, num_epochs);
     std::cout << "Final Train Loss: " << metrics[0][metrics[0].size() - 1] << "\n";
     std::cout << "Final Train Accuracy: " << metrics[1][metrics[1].size() - 1] << "\n";
     std::cout << "Final Validation Loss: " << metrics[2][metrics[2].size() - 1] << "\n";
     std::cout << "Final Validation Accuracy: " << metrics[3][metrics[3].size() - 1] << "\n";
-
+    
     // Predicting
     std::string test_filename = "prediction.csv";
     DataFrame test_df = DataFrame(test_filename);
 
     DataFrame player_df = test_df.GetColumn("player_name");
     test_df.DropColumns(cols_to_drop);
+    test_df.DropColumns({"pick"});
+
     test_df.FillEmpty("Rec Rank", "0");
 
     std::vector<std::string> col_means_str;
@@ -61,5 +66,15 @@ int main() {
     test_df.ConvertToNumber();
     test_df.Normalize(col_maxes, col_mins);
     std::vector<bool> prediction = mlp.Predict(test_df.GetInputs());
+
+    std::cout << "Drafted Players\n";
+    int count = 0;
+    for (size_t i = 0; i < prediction.size(); i++) {
+        if (prediction[i] == 1) {
+            std::cout << "Player: " << player_df.GetData()[i][0] << "\n";
+            count += 1;
+        }
+    }
+    std::cout << count << "\n";
     return 0;
 }

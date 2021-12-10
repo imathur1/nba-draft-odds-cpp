@@ -5,7 +5,6 @@
 #include "catch.hpp"
 #include "dataframe.hpp"
 #include "mlp.hpp"
-#include <iostream>
 
 TEST_CASE("DataFrame ReadCSV", "[DF_ReadCSV]") {
     SECTION("Reading csv with valid name") {

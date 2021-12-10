@@ -362,11 +362,12 @@ void MLP::UpdateWeightsBiases(std::vector<std::vector<std::vector<double>>> weig
 }
 
 std::vector<std::vector<double>> MLP::Sigmoid(std::vector<std::vector<double>> z) {
+    // c++ rounding it off which makes loss slightly off?
     std::vector<std::vector<double>> all_results;
     for (size_t i = 0; i < z.size(); i++) {
         std::vector<double> results;
         for (size_t j  = 0; j < z[i].size(); j++) {
-            results.push_back((1/(1 + exp(-z[i][j]))));
+            results.push_back((1/(1 + exp(-1 * z[i][j]))));
         }
         all_results.push_back(results);
     }
@@ -422,7 +423,16 @@ std::vector<std::vector<double>> MLP::BCE(std::vector<std::vector<double>> actua
     for (size_t i = 0; i < actual.size(); i++) {
         std::vector<double> losses;
         for (size_t j = 0; j < actual[i].size(); j++) {
-            double loss = -1 * (actual[i][j] * log10(predict[i][j]) + (1 - actual[i][j]) * log10(1 - predict[i][j]));
+            double y = actual[i][j];
+            double y_hat = predict[i][j];
+            if (y_hat == 1) {
+                if (y == 1) {
+                    losses.push_back(0);
+                    continue;
+                }
+                y_hat -= pow(10, -15);
+            }
+            double loss = -1 * (y * log(y_hat) + (1 - y) * log(1 - y_hat));
             losses.push_back(loss);
         }
         all_losses.push_back(losses);
@@ -435,7 +445,14 @@ std::vector<std::vector<double>> MLP::BCEPrime(std::vector<std::vector<double>> 
     for (size_t i = 0; i < actual.size(); i++) {
         std::vector<double> losses;
         for (size_t j = 0; j < actual[i].size(); j++) {
-            double loss = -1 * actual[i][j] / predict[i][j] + (1 - actual[i][j]) / (1 - predict[i][j]);
+            double y = actual[i][j];
+            double y_hat = predict[i][j];
+            if (y_hat == 1) {
+                y_hat -= pow(10, -15);
+            } else if (y_hat == 0) {
+                y_hat += pow(10, -15);
+            }
+            double loss = -1 * y / y_hat + (1 - y) / (1 - y_hat);
             losses.push_back(loss);
         }
         all_losses.push_back(losses);

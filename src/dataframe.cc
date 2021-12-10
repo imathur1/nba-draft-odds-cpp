@@ -165,7 +165,6 @@ std::vector<std::vector<std::vector<double>>> DataFrame::GetTrainValidSplit(doub
             y_train.push_back(y_df.inputs_[row]);
         }
     }
-
     std::vector<std::vector<std::vector<double>>> data = {x_train, y_train, x_valid, y_valid};
     return data;
 }
@@ -189,30 +188,35 @@ DataFrame DataFrame::GetColumn(std::string column) {
 }
 
 void DataFrame::ConvertToNumber() {
-    col_means_.clear();
-    col_mins_.clear();
-    col_maxes_.clear();
     for (size_t i = 0; i < data_.size(); i++) {
-        double mean = 0;
-        double min = std::numeric_limits<double>::min();
-        double max = std::numeric_limits<double>::max();
         std::vector<double> v;
         for (size_t j = 0; j < data_.at(i).size(); j++) {
             try {
                 v.push_back(std::stod(data_.at(i).at(j)));
-                mean += v[j];
-                if (v[j] < min) {
-                    min = v[j];
-                }
-                if (v[j] > max) {
-                    max = v[j];
-                }
             } catch (std::invalid_argument e) {
                 throw std::runtime_error("Invalid argument");
             }
         }
         inputs_.push_back(v);
-        col_means_.push_back(mean / data_.at(i).size());
+    }
+
+    col_means_.clear();
+    col_mins_.clear();
+    col_maxes_.clear();
+    for (size_t col = 0; col < col_names_.size(); col++) {
+        double mean = inputs_.at(0).at(col);
+        double max = inputs_.at(0).at(col);
+        double min = inputs_.at(0).at(col);
+        for (size_t row = 1; row < inputs_.size(); row++) {
+            mean += inputs_.at(row).at(col);
+            if (inputs_.at(row).at(col) > max) {
+                max = inputs_.at(row).at(col);
+            }
+            if (inputs_.at(row).at(col) < min) {
+                min = inputs_.at(row).at(col);
+            }
+        }
+        col_means_.push_back(mean / inputs_.size());
         col_mins_.push_back(min);
         col_maxes_.push_back(max);
     }
