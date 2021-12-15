@@ -1,4 +1,4 @@
-# custom-nba-mlp-cpp
+# NBA Draft Odds in C++
 
 An implementation of https://github.com/imathur1/custom-nba-mlp in C++.
 
